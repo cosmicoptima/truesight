@@ -1,0 +1,122 @@
+celeste_midjourney_pfp:
+  task_type: multiple_choice
+  description_title: Rate Midjourney prompts
+  description_body: >-
+    You are trying to find a profile picture. Enter each prompt into Midjourney. How close are the resulting images to the profile picture you want? Use the following rating scale:
+  rating_descriptions:
+    A: This is what I want/very close to what I want
+    B: This is somewhat close to what I want
+    C: This is fine/has some of what I want
+    D: This is not really what I want
+    F: This is definitely not what I want
+    Z: This prompt is too similar to a previous prompt/Something else is wrong
+  rating_scores:
+    A: 16
+    B: 8
+    C: 4
+    D: 2
+    F: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: midjourney_pfp_prompts
+
+greek_names:
+  task_type: multiple_choice
+  description_title: Rate names
+  description_body: >-
+    You are trying to find a name. Rate each name by how much you like it. Use the following rating scale:
+  rating_descriptions:
+    A: I am strongly considering this name
+    B: I am weakly considering this name
+    C: I don't know/Shrug
+    D: I don't like this name
+    F: I hate this name
+    Z: This question is boring, confusing, or repetitive
+  rating_scores:
+    A: 16
+    B: 8
+    C: 4
+    D: 2
+    F: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: greek_names
+
+free_response:
+  task_type: free_response
+  description_title: Answer questions
+  description_body: >-
+    You will now be asked open-ended questions about yourself, or about your answers up to this point. Answer them to the best of your ability.
+  answers_header: Answers
+  seed_question_file: free_response
+
+hyperoptimized_character:
+  task_type: multiple_choice
+  description_title: Rate concepts
+  description_body: |-
+    Suppose that we were going to create a fictional character that is hyperoptimized for being perceived by you as profound and salient.
+    How much/how centrally should each concept be thematically incorporated? Use the following rating scale:
+
+    (If you want to specify the direction or manner in which a concept should be incorporated, you can add a comment.)
+  rating_descriptions:
+    A: This should be very central/This is very meaningful to me
+    B: Incorporating this is likely a good idea
+    C: I don't know/It could go either way
+    D: Probably don't incorporate this
+    F: Definitely don't incorporate this
+    Z: This question is boring, confusing, or repetitive
+  rating_scores:
+    A: 16
+    B: 8
+    C: 4
+    D: 2
+    F: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: topics
+
+hyperoptimized_media:
+  task_type: multiple_choice
+  description_title: Rate concepts
+  description_body: |-
+    Suppose that we were going to create a piece of media that is hyperoptimized for being perceived by you as profound and salient.
+    How much/how centrally should each concept be thematically incorporated? Use the following rating scale:
+  rating_descriptions:
+    A: This should be very central/This is very meaningful to me
+    B: Incorporating this is likely a good idea
+    C: I don't know/It could go either way
+    D: Probably don't incorporate this
+    F: Definitely don't incorporate this
+    Z: This question is boring, confusing, or repetitive
+  rating_scores:
+    A: 16
+    B: 8
+    C: 4
+    D: 2
+    F: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: topics
+
+hyperoptimized_media_2:
+  task_type: multiple_choice
+  description_title: Rate concepts
+  description_body: |-
+    Suppose that we were going to create a piece of media that is hyperoptimized for being perceived by you as profound and salient.
+    Ask yourself how much/how centrally each concept should be thematically incorporated into this media. Then compare with the concepts you've rated so far, using the following rating scale:
+  rating_descriptions:
+    ++: This is very meaningful to me OR Much warmer
+    +: Incorporating this is likely a good idea OR Warmer
+    "~": I don't know/Mixed OR Yes, but this has already been covered by concepts I've rated positively
+    "-": I'm ambivalent or skeptical
+    --: Probably don't incorporate this
+    Z: This question is boring, confusing, or repetitive
+  rating_scores:
+    ++: 16
+    +: 8
+    "~": 4
+    "-": 2
+    --: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: topics

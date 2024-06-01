@@ -1,0 +1,32 @@
+- type: sequence
+  sequences:
+    - type: predefined
+      task: greek_names
+      length: 4
+      initial_pool_size: 512
+      iterated_pool_size: 32
+      color: yellow
+    - type: predefined
+      task: greek_names
+      length: 4
+      initial_pool_size: 512
+      iterated_pool_size: 32
+      color: yellow
+    - type: predefined
+      task: free_response
+      length: 1
+      initial_pool_size: 1
+      iterated_pool_size: 1
+      color: green
+- type: cycle
+  sequences:
+    - type: weaved
+      task: free_response
+      length: 3
+      n: 32
+      color: bright_green
+    - type: weaved
+      task: greek_names
+      length: 15
+      n: 64
+      color: bright_yellow
