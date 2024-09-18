@@ -120,3 +120,49 @@ hyperoptimized_media_2:
     Z: 0
   answers_header: Ratings
   seed_question_file: topics
+
+salience_basic:
+  task_type: multiple_choice
+  description_title: Rate concepts
+  description_body: "How interesting/salient do you find each of the following topics? Use the following rating scale:"
+  rating_descriptions:
+    A: This is VERY interesting/salient
+    B: This is pretty interesting/salient
+    C: This is sort of interesting/salient
+    D: This is not really interesting/salient
+    F: This is definitely not interesting/salient
+    Z: This question is boring, confusing, or repetitive
+  rating_scores:
+    A: 16
+    B: 8
+    C: 4
+    D: 2
+    F: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: topics
+
+vibecamp_event_name:
+  task_type: multiple_choice
+  description_title: Rate names
+  description_body: |-
+    You are designing an event for Vibecamp. You are currently unsure of most of the details concerning it, but it will demonstrate a novel way of using base language models.
+    Those participating in the event will take a highly personalized and optimized test, then will receive a result.
+    You need to name the event, so you can register the website that the test will take place on. You want the name to be both aesthetically pleasing and attention-grabbing/immediately compelling.
+    Rate each name using the following rating scale:
+  rating_descriptions:
+    A: I like this name a lot/It is a strong candidate
+    B: I like this name/It is a weak candidate
+    C: I don't know/It could go either way
+    D: I probably won't use this name/I don't think it works
+    F: I definitely won't use this name/It definitely doesn't work
+    Z: I'm confused/Something is wrong
+  rating_scores:
+    A: 24
+    B: 8
+    C: 4
+    D: 2
+    F: 1
+    Z: 0
+  answers_header: Ratings
+  seed_question_file: oracular_names

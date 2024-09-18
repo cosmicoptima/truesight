@@ -9,15 +9,25 @@ from itertools import chain
 from math import exp
 from numpy import random
 import os
+from statistics import stdev
 import sys
-from typing import Generator, List
+from typing import Generator, List, Optional
 from yaml import safe_load
 
 from openai import AsyncOpenAI
 from rich.console import Console
 
 console = Console(highlight=False)
-openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), organization=os.getenv("OPENAI_ORG"))
+openai = AsyncOpenAI(
+    api_key=os.getenv("TRUESIGHT_API_KEY"),
+    base_url="https://api.hyperbolic.xyz/v1"
+)
+
+
+async def complete(**kwargs):
+    completion = await openai.completions.create(model="meta-llama/Meta-Llama-3.1-405B", **kwargs)
+    print(completion)
+    return completion
 
 
 @dataclass
@@ -126,8 +136,8 @@ class QuestionSequence(ABC):
 class PredefinedQS(QuestionSequence):
     task: Task
     length: int
-    initial_pool_size: int
-    iterated_pool_size: int
+    initial_pool_size: Optional[int]
+    iterated_pool_size: Optional[int]
     color: str
 
     @staticmethod
@@ -135,8 +145,8 @@ class PredefinedQS(QuestionSequence):
         return PredefinedQS(
             TASKS[d["task"]],
             d["length"],
-            d["initial_pool_size"],
-            d["iterated_pool_size"],
+            d.get("initial_pool_size"),
+            d.get("iterated_pool_size"),
             d["color"]
         )
 
@@ -311,21 +321,38 @@ class Divination:
         return list(set([qa_pair.question for qa_pair in sorted_qa_pairs]))
 
     async def rank_mc(self, questions):
+        # MODIFIED, MAY NOT HAVE FULLY PROPAGATED
+
         async def rank_batch(batch):
             prompts = [self.prompt(question) for question in batch]
-            response = await openai.completions.create(model="gpt-4-base", prompt=prompts, max_tokens=1)
-            return [QAPair(batch[i], choice.text.strip()) for i, choice in enumerate(response.choices)]
+            response = await complete(prompt=prompts, max_tokens=1, logprobs=5)
+
+            # expected score + (1 - stdev(logprobs))
+            def score_choice(choice):
+                rating_scores = self.latest_mc_task().rating_scores
+
+                expected_score = 0
+                for token in choice.logprobs.tokens:
+                    cond_score = rating_scores.get(token.strip(), 0)
+                    p = exp(choice.logprobs.top_logprobs[0].get(token, 0))
+
+                    expected_score += cond_score * p
+                
+                inv_stdev = (1 - stdev(choice.logprobs.top_logprobs[0].values())) * max(rating_scores.values())
+
+                return expected_score + inv_stdev
+
+            return [(batch[i], score_choice(choice)) for i, choice in enumerate(response.choices)]
         
         batch_results = await asyncio.gather(*[rank_batch(questions[i:i + 128]) for i in range(0, len(questions), 128)])
-        return self.rank_qa_pairs(list(chain(*batch_results)))
+        return [question for question, socre in sorted(list(chain(*batch_results)), key=lambda x: x[1], reverse=True)]
 
     async def rank_fr(self, questions):
         task_i = self.indices(self.items[-1])[0] + 1
         question_i = 1
 
         prompts = [self.postfill_prompt(task_i, question_i, question) for question in questions]
-        response = await openai.completions.create(
-            model="gpt-4-base",
+        response = await complete(
             prompt=prompts,
             max_tokens=1,
             logprobs=5,
@@ -350,8 +377,7 @@ class Divination:
             return await self.rank_fr(questions)
 
     async def weave_mc(self, n):
-        response = await openai.completions.create(
-            model="gpt-4-base",
+        response = await complete(
             prompt=self.prompt(),
             n=n,
             max_tokens=64,
@@ -371,8 +397,7 @@ class Divination:
         return self.rank_qa_pairs(qa_pairs)
     
     async def weave_fr(self, n):
-        response = await openai.completions.create(
-            model="gpt-4-base",
+        response = await complete(
             prompt=self.free_response_prompt(),
             n=n,
             max_tokens=512,
@@ -399,8 +424,15 @@ class Divination:
 
         match question_sequence:
             case PredefinedQS(task=task, initial_pool_size=initial_pool_size, iterated_pool_size=iterated_pool_size):
-                initial_pool = random.choice(self.seed_questions, initial_pool_size, replace=False)
-                iterated_pool = (await self.rank(initial_pool, task))[:iterated_pool_size]
+                if initial_pool_size is not None:
+                    initial_pool = random.choice(self.seed_questions, initial_pool_size, replace=False)
+                else:
+                    initial_pool = self.seed_questions
+                
+                if iterated_pool_size is not None:
+                    iterated_pool = (await self.rank(initial_pool, task))[:iterated_pool_size]
+                else:
+                    iterated_pool = (await self.rank(initial_pool, task))
 
         for i in range(question_sequence.length):
             questions = []
