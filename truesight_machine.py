@@ -20,13 +20,12 @@ from rich.console import Console
 console = Console(highlight=False)
 openai = AsyncOpenAI(
     api_key=os.getenv("TRUESIGHT_API_KEY"),
-    base_url="https://api.hyperbolic.xyz/v1"
+    base_url="https://o0umi1fzv2nk93-8000.proxy.runpod.net/v1"
 )
 
 
 async def complete(**kwargs):
-    completion = await openai.completions.create(model="meta-llama/Meta-Llama-3.1-405B", **kwargs)
-    print(completion)
+    completion = await openai.completions.create(model="meta-llama/Meta-Llama-3.1-405B-FP8", **kwargs)
     return completion
 
 
@@ -327,7 +326,6 @@ class Divination:
             prompts = [self.prompt(question) for question in batch]
             response = await complete(prompt=prompts, max_tokens=1, logprobs=5)
 
-            # expected score + (1 - stdev(logprobs))
             def score_choice(choice):
                 rating_scores = self.latest_mc_task().rating_scores
 
@@ -337,10 +335,8 @@ class Divination:
                     p = exp(choice.logprobs.top_logprobs[0].get(token, 0))
 
                     expected_score += cond_score * p
-                
-                inv_stdev = (1 - stdev(choice.logprobs.top_logprobs[0].values())) * max(rating_scores.values())
 
-                return expected_score + inv_stdev
+                return expected_score
 
             return [(batch[i], score_choice(choice)) for i, choice in enumerate(response.choices)]
         

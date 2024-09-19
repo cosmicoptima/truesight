@@ -1,7 +1,19 @@
+# - type: sequence
+#   sequences:
+#     - type: predefined
+#       task: salience_basic
+#       length: 4
+#       iterated_pool_size: 25
+#       color: bright_green
 - type: cycle
   sequences:
     - type: predefined
       task: salience_basic
-      length: 4
-      iterated_pool_size: 25
-      color: bright_yellow
+      length: 6
+      iterated_pool_size: 18
+      color: bright_green
+#     - type: weaved
+#       task: salience_basic
+#       length: 2
+#       n: 64
+#       color: green
